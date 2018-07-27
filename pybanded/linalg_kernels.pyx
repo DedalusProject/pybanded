@@ -22,13 +22,13 @@ cdef double_rc csign(double_rc x):
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef qr_banded_kernel(double_rc[::1,:] R,
+cpdef qr_banded_kernel(double_rc[::1,:] W,
                        double_rc[::1,:] Q,
+                       int I,
+                       int J,
                        int M,
                        int N,
-                       int m,
-                       int n,
-                       int RU):
+                       int WU):
     # Allocate indeces
     cdef int j, p, di, k, xi
     # Allocate scratch variables
@@ -37,12 +37,12 @@ cpdef qr_banded_kernel(double_rc[::1,:] R,
     # Loop over columns
     for j in range(N):
         # Determine number of rows including+below diagonal
-        p = M - max(0, j - (m-M))
+        p = M - max(0, j - (I-M))
         # Compute norm(x)
-        x0 = R[RU, j]
+        x0 = W[WU, j]
         sr = abs(x0)**2
         for di in range(1, p):
-            sr = sr + abs(R[RU+di, j])**2
+            sr = sr + abs(W[WU+di, j])**2
         src = sr**0.5
         # Compute first index of Householder vector
         u0 = x0 + src * csign(x0)
@@ -51,15 +51,15 @@ cpdef qr_banded_kernel(double_rc[::1,:] R,
         src = sr**(-0.5)
         Q[0, j] = u0 * src
         for di in range(1, p):
-            Q[di, j] = R[RU+di, j] * src
-        # Apply reflection to remainder of R
-        for k in range(j, min(j+1+RU, n)):
-            xi = RU-(k-j)
+            Q[di, j] = W[WU+di, j] * src
+        # Apply reflection to remainder of W
+        for k in range(j, min(j+1+WU, J)):
+            xi = WU-(k-j)
             # Compute v.x
             src = 0
             for di in range(p):
-                src = src + Q[di, j].conjugate() * R[xi+di, k]
+                src = src + Q[di, j].conjugate() * W[xi+di, k]
             # Apply reflection to x
             for di in range(p):
-                R[xi+di, k] = R[xi+di, k] - 2 * src * Q[di, j]
+                W[xi+di, k] = W[xi+di, k] - 2 * src * Q[di, j]
 

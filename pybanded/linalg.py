@@ -83,28 +83,24 @@ class BandedQR:
     @staticmethod
     def factorize(A):
         # Check shape
-        m, n = A.shape
-        if m < n:
+        I, J = A.shape
+        if I < J:
             raise ValueError("Matrix must have at least as many rows as columns.")
-        # Copy A to scratch R matrix with expanded storage
-        R = BandedMatrix(A.shape, A.dtype, A.L, A.U+A.L)
-        R.data[A.L:, :] = A.data
-        # Local references
-        RU = R.U
-        RL = R.L
-        M = RL + 1
-        N = min(m-1, n)
-        # Create matrix for compressed Q
-        W = np.zeros((M, N), dtype=R.dtype, order='F')
+        # Copy A to work matrix with expanded storage
+        WU = A.U + A.L
+        WL = A.L
+        W = BandedMatrix(A.shape, A.dtype, L=WL, U=WU)
+        W.data[A.L:, :] = A.data
+        # Create compressed Q
+        M = WL + 1
+        N = min(I-1, J)
+        Q = BandedReflector(I, A.dtype, M, N)
         # Apply kernel
-        kernels.qr_banded_kernel(R.data, W, M, N, m, n, RU)
-        # Return R without extra scratch space
-        Rn = BandedMatrix(R.shape, R.dtype, L=0, U=RU)
-        Rn.data[:] = R.data[:RU+1]
-        # Build banded Q
-        Q = BandedReflector(m, A.dtype, M, N)
-        np.copyto(Q.data, W)
-        return Q, Rn
+        kernels.qr_banded_kernel(W.data, Q.data, I, J, M, N, WU)
+        # Build R from W without extra scratch space
+        R = BandedMatrix(W.shape, W.dtype, L=0, U=WU)
+        R.data[:] = W.data[:WU+1]
+        return Q, R
 
     def solve(self, b):
         """Solve matrix against one right-hand side."""
