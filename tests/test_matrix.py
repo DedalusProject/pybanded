@@ -33,6 +33,7 @@ def random_vector(J, complex=True):
 @pytest.mark.parametrize('A_complex', [True,False])
 @pytest.mark.parametrize('x_complex', [True,False])
 def test_matvec(I, J, U, L, A_complex, x_complex):
+    """Test matrix-vector multiplication."""
     A_ban = random_banded(I, J, U, L, A_complex)
     A_csr = A_ban.todia().tocsr()
     x = random_vector(J, x_complex)
@@ -46,6 +47,7 @@ def test_matvec(I, J, U, L, A_complex, x_complex):
 @pytest.mark.parametrize('A_complex', [True,False])
 @pytest.mark.parametrize('x_complex', [True,False])
 def test_rmatvec(I, J, U, L, A_complex, x_complex):
+    """Test Hermitian matrix-vector multiplication."""
     A_ban = random_banded(I, J, U, L, A_complex)
     A_csr = A_ban.todia().tocsr()
     x = random_vector(I, x_complex)

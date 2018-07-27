@@ -32,6 +32,7 @@ def random_vector(J, complex=True):
 @pytest.mark.parametrize('H_complex', [True,False])
 @pytest.mark.parametrize('x_complex', [True,False])
 def test_matvec(I, M, ImN, H_complex, x_complex):
+    """Test matrix-vector multiplication."""
     N = I - ImN
     H = random_ref(I, M, N, H_complex)
     H_dense = H.todense()
@@ -45,6 +46,7 @@ def test_matvec(I, M, ImN, H_complex, x_complex):
 @pytest.mark.parametrize('H_complex', [True,False])
 @pytest.mark.parametrize('x_complex', [True,False])
 def test_rmatvec(I, M, ImN, H_complex, x_complex):
+    """Test Hermitian matrix-vector multiplication."""
     N = I - ImN
     H = random_ref(I, M, N, H_complex)
     H_dense = H.todense()

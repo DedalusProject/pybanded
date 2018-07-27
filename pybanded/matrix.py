@@ -1,4 +1,4 @@
-"""Sparse matrix in banded format."""
+"""Sparse matrices in banded format."""
 
 
 import numpy as np

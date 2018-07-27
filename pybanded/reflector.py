@@ -59,7 +59,6 @@ class BandedReflector(spla.LinearOperator):
         dense_data = np.zeros((I, N), dtype=self.dtype, order='F')
         for n in range(min(N, I)):
             p = min(I-n, M)
-            print(p)
             dense_data[n:n+p, n] = self.data[0:p, n]
         return dense_data
 
