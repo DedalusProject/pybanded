@@ -9,9 +9,9 @@ import pybanded
 def random_banded(I, J, L, U, complex=True):
     """Build banded matrix with random entries."""
     if complex:
-        data = np.random.randn(L+U+1, J)
-    else:
         data = np.random.randn(L+U+1, J) + 1j*np.random.randn(L+U+1, J)
+    else:
+        data = np.random.randn(L+U+1, J)
     offsets = np.arange(-L, U+1)
     A_dia = sp.dia_matrix((data, offsets), shape=(I, J))
     A_ban = pybanded.BandedMatrix.from_sparse(A_dia)
