@@ -30,36 +30,37 @@ cpdef qr_banded_kernel(double_rc[::1,:] W,
                        int N,
                        int WU):
     # Allocate indeces
-    cdef int j, p, di, k, xi
+    cdef int n, m, dm, k, xi
     # Allocate scratch variables
     cdef double sr
     cdef double_rc src, x0, u0
     # Loop over columns
-    for j in range(N):
+    for n in range(N):
         # Determine number of rows including+below diagonal
-        p = M - max(0, j - (I-M))
+        dm = min(M, I-n)
         # Compute norm(x)
-        x0 = W[WU, j]
+        x0 = W[WU, n]
         sr = abs(x0)**2
-        for di in range(1, p):
-            sr = sr + abs(W[WU+di, j])**2
+        for m in range(1, dm):
+            sr = sr + abs(W[WU+m, n])**2
         src = sr**0.5
         # Compute first index of Householder vector
         u0 = x0 + src * csign(x0)
         # Normalize Householder vector
         sr = sr + abs(u0)**2 - abs(x0)**2
         src = sr**(-0.5)
-        Q[0, j] = u0 * src
-        for di in range(1, p):
-            Q[di, j] = W[WU+di, j] * src
+        Q[0, n] = u0 * src
+        for m in range(1, dm):
+            Q[m, n] = W[WU+m, n] * src
         # Apply reflection to remainder of W
-        for k in range(j, min(j+1+WU, J)):
-            xi = WU-(k-j)
-            # Compute v.x
+        for k in range(n, min(n+1+WU, J)):
+            xi = WU-(k-n)
+            # Compute 2 * v.H @ x
             src = 0
-            for di in range(p):
-                src = src + Q[di, j].conjugate() * W[xi+di, k]
+            for m in range(dm):
+                src = src + Q[m, n].conjugate() * W[xi+m, k]
+            src = 2 * src
             # Apply reflection to x
-            for di in range(p):
-                W[xi+di, k] = W[xi+di, k] - 2 * src * Q[di, j]
+            for m in range(dm):
+                W[xi+m, k] = W[xi+m, k] - src * Q[m, n]
 

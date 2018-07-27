@@ -1,4 +1,6 @@
 """Cythonized kernels for reflector operations."""
+# TODO: optimize by moving copies out to Python?
+# TODO: optimize by ensuring contiguous data
 
 cimport cython
 
@@ -28,7 +30,7 @@ cpdef banded_ref_matvec_kernel(double_rc[::1, :] Q,
         b[i] = a[i]
     # Compute output
     for n in reversed(range(min(N, I))):
-        dm = min(I-n, M)
+        dm = min(M, I-n)
         # Compute v.x
         src = 0
         for m in range(dm):
@@ -56,7 +58,7 @@ cpdef banded_ref_rmatvec_kernel(double_rc[::1, :] Q,
         b[i] = a[i]
     # Compute output
     for n in range(min(N, I)):
-        dm = min(I-n, M)
+        dm = min(M, I-n)
         # Compute v.x
         src = 0
         for m in range(dm):
