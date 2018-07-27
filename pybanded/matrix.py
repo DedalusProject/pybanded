@@ -24,12 +24,14 @@ class BandedMatrix(spla.LinearOperator):
     Attributes
     ----------
     data : np.ndarray
-        Data in compressed banded format
+        Data in compressed banded format (see notes)
 
     Notes
     -----
     Storage scheme follows LAPACK spec for banded matrices:
-    http://www.netlib.org/lapack/lug/node124.html
+        http://www.netlib.org/lapack/lug/node124.html
+    Specifically, elements are mapped as
+        data[i, j] = matrix[j-U+i, j]
 
     """
 
@@ -38,7 +40,7 @@ class BandedMatrix(spla.LinearOperator):
         self.dtype = dtype
         self.L = L
         self.U = U
-        # Initialize data with Fortran ordering for faster column-based operations
+        # Initialize data with Fortran ordering for faster column operations
         self.data = np.zeros((U+L+1, shape[1]), dtype=dtype, order='F')
 
     @classmethod
