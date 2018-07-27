@@ -22,7 +22,7 @@ cdef double_rc csign(double_rc x):
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef qr_banded_kernel(double_rc[::1,:] W,
+cpdef banded_qr_kernel(double_rc[::1,:] W,
                        double_rc[::1,:] Q,
                        int I,
                        int J,

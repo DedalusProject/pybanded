@@ -96,7 +96,7 @@ class BandedQR:
         N = min(I-1, J)
         Q = BandedReflector(I, A.dtype, M, N)
         # Apply kernel
-        kernels.qr_banded_kernel(W.data, Q.data, I, J, M, N, WU)
+        kernels.banded_qr_kernel(W.data, Q.data, I, J, M, N, WU)
         # Build R from W without extra scratch space
         R = BandedMatrix(W.shape, W.dtype, L=0, U=WU)
         R.data[:] = W.data[:WU+1]
