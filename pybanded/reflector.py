@@ -58,8 +58,8 @@ class BandedReflector(spla.LinearOperator):
         # Create dense reflectors
         dense_data = np.zeros((I, N), dtype=self.dtype, order='F')
         for n in range(min(N, I)):
-            p = min(I-n, M)
-            dense_data[n:n+p, n] = self.data[0:p, n]
+            dm = min(I-n, M)
+            dense_data[n:n+dm, n] = self.data[0:dm, n]
         return dense_data
 
     def todense(self):

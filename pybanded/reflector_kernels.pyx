@@ -1,6 +1,5 @@
 """Cythonized kernels for reflector operations."""
 
-import numpy as np
 cimport cython
 
 
@@ -21,7 +20,7 @@ cpdef banded_ref_matvec_kernel(double_rc[::1, :] Q,
                                int N):
     """Matrix-vector multiplication for banded reflector."""
     # Allocate indeces
-    cdef int n, p, di
+    cdef int n, m, dm
     # Allocate scratch variables
     cdef double_rc src
     # Copy a to b
@@ -29,14 +28,14 @@ cpdef banded_ref_matvec_kernel(double_rc[::1, :] Q,
         b[i] = a[i]
     # Compute output
     for n in reversed(range(min(N, I))):
-        p = min(I-n, M)
+        dm = min(I-n, M)
         # Compute v.x
         src = 0
-        for di in range(p):
-            src = src + Q[di, n].conjugate() * b[n+di]
+        for m in range(dm):
+            src = src + Q[m, n].conjugate() * b[n+m]
         # Apply reflection to x
-        for di in range(p):
-            b[n+di] = b[n+di] - 2 * src * Q[di, n]
+        for m in range(dm):
+            b[n+m] = b[n+m] - 2 * src * Q[m, n]
 
 
 @cython.boundscheck(False)
@@ -49,7 +48,7 @@ cpdef banded_ref_rmatvec_kernel(double_rc[::1, :] Q,
                                 int N):
     """Hermitian matrix-vector multiplication for banded reflector."""
     # Allocate indeces
-    cdef int n, p, di
+    cdef int n, m, dm
     # Allocate scratch variables
     cdef double_rc src
     # Copy a to b
@@ -57,12 +56,12 @@ cpdef banded_ref_rmatvec_kernel(double_rc[::1, :] Q,
         b[i] = a[i]
     # Compute output
     for n in range(min(N, I)):
-        p = min(I-n, M)
+        dm = min(I-n, M)
         # Compute v.x
         src = 0
-        for di in range(p):
-            src = src + Q[di, n].conjugate() * b[n+di]
+        for m in range(dm):
+            src = src + Q[m, n].conjugate() * b[n+m]
         # Apply reflection to x
-        for di in range(p):
-            b[n+di] = b[n+di] - 2 * src * Q[di, n]
+        for m in range(dm):
+            b[n+m] = b[n+m] - 2 * src * Q[m, n]
 
