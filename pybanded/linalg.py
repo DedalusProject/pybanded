@@ -24,7 +24,7 @@ def solve_banded(A, b):
     -----
     The solve strategy is based on the matrix structure:
         diagonal: simple division
-        triangular: scipy.linalg.solve_banded
+        triangular: LAPACK *tbtrs
         other: scipy.linalg.solve_banded
     """
     # Check shapes
