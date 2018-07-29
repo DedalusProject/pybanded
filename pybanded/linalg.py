@@ -40,10 +40,30 @@ def solve_banded(A, b):
         x = b / A.data[0]
     elif A.U == 0:
         # Lower triangular
-        x = sla.solve_banded((A.L, A.U), A.data, b)
+        dtype = np.promote_types(A.dtype, b.dtype)
+        # Cast A.data in case type promotion is necessary
+        cast_Adata = A.data.astype(dtype, order='F', copy=False)
+        # Cast b in case type promotion or memory reordering is necessary
+        # Force copy since kernel changes b->x inplace
+        x = cast_b = b.astype(dtype, order='F', copy=True)
+        # Call kernel
+        info = kernels.solve_banded_lower_triangular(cast_Adata, cast_b, A.shape[0], A.L)
+        # Check for error code
+        if info:
+            raise RuntimeError("LAPACK returned error code: %i" %info)
     elif A.L == 0:
         # Upper triangular
-        x = sla.solve_banded((A.L, A.U), A.data, b)
+        dtype = np.promote_types(A.dtype, b.dtype)
+        # Cast A.data in case type promotion is necessary
+        cast_Adata = A.data.astype(dtype, order='F', copy=False)
+        # Cast b in case type promotion or memory reordering is necessary
+        # Force copy since kernel changes b->x inplace
+        x = cast_b = b.astype(dtype, order='F', copy=True)
+        # Call kernel
+        info = kernels.solve_banded_upper_triangular(cast_Adata, cast_b, A.shape[0], A.U)
+        # Check for error code
+        if info:
+            raise RuntimeError("LAPACK returned error code: %i" %info)
     else:
         # Use scipy banded solve
         x = sla.solve_banded((A.L, A.U), A.data, b)

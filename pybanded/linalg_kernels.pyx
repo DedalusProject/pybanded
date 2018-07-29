@@ -1,6 +1,7 @@
 """Cythonized kernels for linear algebra."""
 
 cimport cython
+cimport scipy.linalg.cython_lapack as lapack
 
 
 # Create fused type for double precision real and complex
@@ -63,4 +64,34 @@ cpdef banded_qr_kernel(double_rc[::1,:] W,
             # Apply reflection to x
             for m in range(dm):
                 W[xi+m, k] = W[xi+m, k] - src * Q[m, n]
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef int solve_banded_upper_triangular(double_rc[::1,:] A,  double_rc[::1] b, int I, int U):
+    cdef int nrhs = 1
+    cdef int ldab = U+1
+    cdef int info = 0
+    if double_rc is double:
+        lapack.dtbtrs(uplo='U', trans='N', diag='N', n=&I, kd=&U, nrhs=&nrhs,
+                      ab=&A[0,0], ldab=&ldab, b=&b[0], ldb=&I, info=&info)
+    elif double_rc is double_complex:
+        lapack.ztbtrs(uplo='U', trans='N', diag='N', n=&I, kd=&U, nrhs=&nrhs,
+                      ab=&A[0,0], ldab=&ldab, b=&b[0], ldb=&I, info=&info)
+    return info
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef int solve_banded_lower_triangular(double_rc[::1,:] A,  double_rc[::1] b, int I, int L):
+    cdef int nrhs = 1
+    cdef int ldab = L+1
+    cdef int info = 0
+    if double_rc is double:
+        lapack.dtbtrs(uplo='L', trans='N', diag='N', n=&I, kd=&L, nrhs=&nrhs,
+                      ab=&A[0,0], ldab=&ldab, b=&b[0], ldb=&I, info=&info)
+    elif double_rc is double_complex:
+        lapack.ztbtrs(uplo='L', trans='N', diag='N', n=&I, kd=&L, nrhs=&nrhs,
+                      ab=&A[0,0], ldab=&ldab, b=&b[0], ldb=&I, info=&info)
+    return info
 
