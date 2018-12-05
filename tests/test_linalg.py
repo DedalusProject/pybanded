@@ -53,8 +53,8 @@ def test_QR_recomposition(I, ImJ, L, U, A_complex):
     A = random_banded(I, J, L, U, A_complex)
     A.data += 10  # offset entries to avoid precision issues
     QR = pybanded.BandedQR(A)
-    A_recomp = QR.Q @ QR.R.todense()
-    assert np.allclose(A_recomp, A.todense())
+    A_recomp = QR.Q @ QR.R.toarray()
+    assert np.allclose(A_recomp, A.toarray())
 
 
 @pytest.mark.parametrize('I', [32,33,45])

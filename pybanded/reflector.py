@@ -62,7 +62,7 @@ class BandedReflector(spla.LinearOperator):
             dense_data[n:n+dm, n] = self.data[0:dm, n]
         return dense_data
 
-    def todense(self):
+    def toarray(self):
         """Create dense copy of full reflector matrix."""
         I, M, N = self.I, self.M, self.N
         dense_data = self._dense_data()

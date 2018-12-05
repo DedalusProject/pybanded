@@ -62,9 +62,9 @@ class BandedMatrix(spla.LinearOperator):
         A_dia = sp.dia_matrix((self.data, offsets), shape=self.shape)
         return A_dia
 
-    def todense(self):
+    def toarray(self):
         """Convert to dense numpy array."""
-        return self.todia().todense()
+        return self.todia().toarray()
 
     def copy(self):
         """Create copy."""

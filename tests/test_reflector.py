@@ -35,7 +35,7 @@ def test_matvec(I, M, ImN, H_complex, x_complex):
     """Test matrix-vector multiplication."""
     N = I - ImN
     H = random_ref(I, M, N, H_complex)
-    H_dense = H.todense()
+    H_dense = H.toarray()
     x = random_vector(I, x_complex)
     assert np.allclose(H@x, H_dense@x)
 
@@ -49,7 +49,7 @@ def test_rmatvec(I, M, ImN, H_complex, x_complex):
     """Test Hermitian matrix-vector multiplication."""
     N = I - ImN
     H = random_ref(I, M, N, H_complex)
-    H_dense = H.todense()
+    H_dense = H.toarray()
     x = random_vector(I, x_complex)
     assert np.allclose(H.H@x, H_dense.conj().T@x)
 
